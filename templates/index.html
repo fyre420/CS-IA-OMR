@@ -1,0 +1,70 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HTML and Python Communication</title>
+</head>
+<body>
+
+	<h2>Please upload an empty (unanswered) copy of the OMR</h2>
+	<!-- Image upload form -->
+	<div style="display: flex; align-items: center;">
+		<!-- Image upload form -->
+		<form id="emptyOMRUpload">
+			<input type="file" name="imageFile" accept="image/*" id="emptyOMR">
+		</form>
+	
+		<!-- Checkbox for pre-scanned image -->
+		<label for="preScanned">Is the picture pre-scanned?</label>
+		<input type="checkbox" name="preScanned" id="preScanned">
+	</div>
+	
+	<!-- Canvas to display the uploaded image -->
+	<p id = "warnHighlights" style="display: none;"> 
+		Draw on the picture to highlight the answer space in the sheet
+	</p>
+	<canvas id="canvas" width="800" height="600" style="display: none;"></canvas>
+	
+	<!-- Buttons -->
+	<div style="display: flex; flex-direction: column; align-items: center;">
+		<!-- Your existing canvas element -->
+		<canvas id="canvas" width="800" height="600" style="display: none;"></canvas>
+		
+		<!-- Buttons -->
+		<div style="display: flex; flex-direction: row; margin-top: 10px;">
+			<button id="clearHighlights" style="display: none; margin-right: 10px;">Clear Highlights</button>
+			<button id="clearButton" style="display: none;">Clear Canvas</button>
+		</div>
+	</div>
+	<br/>
+	
+	<!-- Add a container to hold the dynamic form -->
+	<div id="dynamicFormContainer">
+		<form id="userInputForm">
+			<br id = "brick">
+            <button type="submit">Scan</button>
+		</form>
+	</div>
+
+
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<h3>Current Limitations</h3>
+	<ul>
+		<li>Need all 4 corners of the page to be visible for anything to happen</li>
+		<li>Breaks really easy if the edges arent good</li>
+		<li>Has maybe a bit too many steps</li>
+		<li>I need to implement the pre-scanned feature</li>
+	</ul>
+
+	<script src = "../app.js"></script>
+
+	
+</body>
+</html>
