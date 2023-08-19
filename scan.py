@@ -97,40 +97,43 @@ def makeOMRConfig(sections, filepath = ""):
 		# bubbleArray = utils.splitBoxes(masked, top_x_contors, 300)
 		# sorted_bubbles = utils.sort_bubbles(bubbleArray, questionsNo, choicesNo)
 		#cv2.imshow(" paste for " + str(i), utils.pasteOnlyBubble(threshold, sorted_bubbles))
-		if i == 0:
-			for j in range(questionsNo*choicesNo):
-				top_x_contors = sorted_contors[:questionsNo*choicesNo-j]
-				bubbleArray = utils.splitBoxes(masked, top_x_contors, 300)
-				sorted_bubbles = utils.sort_bubbles(bubbleArray, questionsNo, choicesNo)
-				cv2.imshow(str(questionsNo*choicesNo-j) + " paste for" + str(i), utils.pasteOnlyBubble(threshold, sorted_bubbles))
+		# if i == 0:
+		# 	for j in range(questionsNo*choicesNo):
+		# 		top_x_contors = sorted_contors[:questionsNo*choicesNo-j]
+		# 		bubbleArray = utils.splitBoxes(masked, top_x_contors, 300)
+		# 		sorted_bubbles = utils.sort_bubbles(bubbleArray, questionsNo, choicesNo)
+		# 		cv2.imshow(str(questionsNo*choicesNo-j) + " paste for" + str(i), utils.pasteOnlyBubble(threshold, sorted_bubbles))
    
 		top_x_contors = sorted_contors[:questionsNo*choicesNo-1]
   
-		bubbleArray = utils.splitBoxes(masked, top_x_contors, 300)
-		#cv2.imshow("proc? " + str(i), masked)
-		#cv2.imshow("hmm? " + str(i), utils.pasteOnlyBubble(threshold, bubbleArray))
+		bubbleArray = utils.splitBoxes(masked, top_x_contors, 300)			
   
 		# for i in bubbleArray:
 		# 	cv2.imshow("bubble " + str(random.random()), i.image)
 		
 		sorted_bubbles = utils.sort_bubbles(bubbleArray, questionsNo, choicesNo)
 
-		table = [sorted_bubbles[i * choicesNo:(i + 1) * choicesNo] for i in range(questionsNo)]
+		# for i in range(len(sorted_bubbles)):
+		# 	cv2.imshow("box " + str(i+1), utils.pasteOnlyBubble(threshold, sorted_bubbles[:i]))
 
-	# 	config = measureConfig.measure(table)
-	# 	config = json.loads(config)
-	# 	bubbles = config["bubbles"]
-	# 	samples = config["samples"]
-	# 	sectionsConfig.append({
-	# 		'bubbles': bubbles,
-	# 		'samples': samples,
-	# 		'sectionData': {
-	#    			'questionsNo': questionsNo, 
-	# 	  		'choicesNo': choicesNo
-	# 		}
-	# 	})
-	# for section in sectionsConfig:
-	# 	create_omr_sheet(section)
+		#table = [sorted_bubbles[i * choicesNo:(i + 1) * choicesNo] for i in range(questionsNo)]
+
+		table = utils.fill_blank_table(sorted_bubbles, questionsNo, choicesNo)
+
+		config = measureConfig.measure(table)
+		config = json.loads(config)
+		bubbles = config["bubbles"]
+		samples = config["samples"]
+		sectionsConfig.append({
+			'bubbles': bubbles,
+			'samples': samples,
+			'sectionData': {
+	   			'questionsNo': questionsNo, 
+		  		'choicesNo': choicesNo
+			}
+		})
+	for section in sectionsConfig:
+		create_omr_sheet(section)
 
 	cv2.waitKey(0)
 
@@ -151,30 +154,30 @@ def create_omr_sheet(config):
 	omr_sheet = np.zeros_like(threshold, dtype=np.uint8)
 
 	for bubble in config['bubbles']:
-		try:
-			row = (bubble['y'] - start_y) // (bubble_height + vertical_margin)
-			col = (bubble['x'] - start_x) // (bubble_width + horizontal_margin)
-			# Get the image data from the config
-			sample_image = config['samples'][col]
+		#try:
+		row = (bubble['y'] - start_y) // (bubble_height + vertical_margin)
+		col = (bubble['x'] - start_x) // (bubble_width + horizontal_margin)
+		# Get the image data from the config
+		sample_image = config['samples'][col]
 
-			# Calculate the adjusted bubble width for pasting
-			adjusted_bubble_width = min(bubble_width, len(sample_image[0]))
+		# Calculate the adjusted bubble width for pasting
+		adjusted_bubble_width = min(bubble_width, len(sample_image[0]))
 
-			# Calculate the carryover (if any) for adjusting the pasting position
-			carryover = (bubble_width - adjusted_bubble_width) // 2
+		# Calculate the carryover (if any) for adjusting the pasting position
+		carryover = (bubble_width - adjusted_bubble_width) // 2
 
-			# Paste the image onto the OMR sheet
-			for i in range(len(sample_image)):
-				omr_sheet[bubble['y'] + i][bubble['x'] + carryover:bubble['x'] + carryover + adjusted_bubble_width] = \
-					sample_image[i][:adjusted_bubble_width]
-		except Exception as e:
-			print("whoops")
-			print(bubble['y'], start_y, bubble_height, vertical_margin)
-			print(bubble['x'], start_x, bubble_width, horizontal_margin)
+		# Paste the image onto the OMR sheet
+		for i in range(len(sample_image)):
+			omr_sheet[bubble['y'] + i][bubble['x'] + carryover:bubble['x'] + carryover + adjusted_bubble_width] = \
+				sample_image[i][:adjusted_bubble_width]
+		# except Exception as e:
+		# 	print("whoops")
+		# 	print(bubble['y'], start_y, bubble_height, vertical_margin)
+		# 	print(bubble['x'], start_x, bubble_width, horizontal_margin)
 		
 
 	# Save the OMR sheet as an image file
-	cv2.imshow('omr_sheet.png', omr_sheet)
+	#cv2.imshow('omr_sheet.png', omr_sheet)
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
 

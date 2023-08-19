@@ -231,27 +231,38 @@ def sort_bubbles(bubbleArray, rowNo, colNo):
     if len(bubbleArray) == 0 or rowNo <= 0 or colNo <= 0:
         return bubbleArray
     
-    print("Input bubbleArray:")
-    for bubble in bubbleArray:
-        print(bubble.x, bubble.y)
-
     # Calculate the band size for x and y coordinates
     x_min = min(bubble.x for bubble in bubbleArray)
     x_max = max(bubble.x for bubble in bubbleArray)
     y_min = min(bubble.y for bubble in bubbleArray)
     y_max = max(bubble.y for bubble in bubbleArray)
 
-    x_band_size = (x_max - x_min) // colNo + 1
-    y_band_size = (y_max - y_min) // rowNo + 1
+    # You can adjust these factors to control the band sizes
+    x_band_factor = 0.1  # Adjust as needed
+    y_band_factor = 0.1  # Adjust as needed
+
+    x_band_size = (x_max - x_min) * x_band_factor / colNo
+    y_band_size = (y_max - y_min) * y_band_factor / rowNo
 
     # Sort the bubbles using custom sorting key
     sorted_bubbles = sorted(bubbleArray, key=lambda bubble: ((bubble.y - y_min) // y_band_size, (bubble.x - x_min) // x_band_size))
     
-    print("Sorted bubbles:")
-    for bubble in sorted_bubbles:
-        print(bubble.x, bubble.y)
-
     return sorted_bubbles
+
+def fill_blank_table(sorted_bubbles, questionsNo, choicesNo):
+    table = []
+
+    for i in range(questionsNo):
+        row_start = i * choicesNo
+        row_end = (i + 1) * choicesNo
+        row_bubbles = sorted_bubbles[row_start:row_end]
+        
+        if len(row_bubbles) < choicesNo:
+            row_bubbles += [None] * (choicesNo - len(row_bubbles))
+        
+        table.append(row_bubbles)
+
+    return table
 
 def replace_outliers_with_average(data, threshold=3.5):
     data = np.array(data)  # Convert the list to a NumPy array
